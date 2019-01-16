@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Title>Vostok logging library</Title>
-    <Description>Logging library for microservice toolkit http://vostok.tools/</Description>
+    <Title>Vostok.Logging.Log4net</Title>
+    <Description>A bridge from Vostok ILog interface to Log4Net ILogger.</Description>
   </PropertyGroup>
 
   <PropertyGroup>
