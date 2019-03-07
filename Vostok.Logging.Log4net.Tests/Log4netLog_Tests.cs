@@ -166,7 +166,7 @@ namespace Vostok.Logging.Log4net.Tests
         }
 
         [Test]
-        public void ForContext_should_support_overriding_logger_name_with_a_chain_of_calls()
+        public void ForContext_should_support_accumulating_logger_name_with_a_chain_of_calls()
         {
             adapter = adapter
                 .ForContext("CustomLogger1")
@@ -175,7 +175,7 @@ namespace Vostok.Logging.Log4net.Tests
 
             adapter.Info("Hello!");
 
-            ObservedEvent.LoggerName.Should().Be("CustomLogger3");
+            ObservedEvent.LoggerName.Should().Be("CustomLogger1.CustomLogger2.CustomLogger3");
         }
 
         private void SetRootLevel(Level level)

@@ -2,9 +2,8 @@
 using JetBrains.Annotations;
 using log4net.Core;
 using log4net.Repository;
-using log4net.Repository.Hierarchy;
 using Vostok.Logging.Abstractions;
-using ILog = Vostok.Logging.Abstractions.ILog;
+using Vostok.Logging.Abstractions.Values;
 
 namespace Vostok.Logging.Log4net
 {
@@ -23,6 +22,7 @@ namespace Vostok.Logging.Log4net
     public class Log4netLog : ILog
     {
         private readonly ILogger logger;
+        private readonly SourceContextValue sourceContext;
 
         public Log4netLog([NotNull] log4net.ILog log)
             : this(log.Logger)
@@ -30,10 +30,25 @@ namespace Vostok.Logging.Log4net
         }
 
         public Log4netLog([NotNull] ILogger logger)
+            : this(logger, IsTrivialLoggerName(logger.Name) ? null : new SourceContextValue(logger.Name))
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        private Log4netLog([NotNull] ILogger logger, SourceContextValue sourceContext)
+        {
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.sourceContext = sourceContext;
+        }
+
+        /// <summary>
+        /// <para>Gets or sets the factory used to obtain logger names from <see cref="SourceContextValue"/>s created with <see cref="ForContext"/> calls.</para>
+        /// <para>Default factory joins source context parts using a dot as separator to obtain logger name.</para>
+        /// </summary>
+        [NotNull]
+        public Func<SourceContextValue, string> LoggerNameFactory { get; set; }
+            = ctx => string.Join(".", ctx);
+
+        /// <inheritdoc />
         public void Log(LogEvent @event)
         {
             if (@event == null)
@@ -45,21 +60,31 @@ namespace Vostok.Logging.Log4net
             logger.Log(Log4netHelpers.TranslateEvent(logger, @event));
         }
 
+        /// <inheritdoc />
         public bool IsEnabledFor(LogLevel level)
         {
             return logger.IsEnabledFor(Log4netHelpers.TranslateLevel(level));
         }
 
+        /// <inheritdoc />
         public ILog ForContext(string context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            var newLogger = logger.Repository.GetLogger(context);
+            var newSourceContext = sourceContext + context;
+
+            if (ReferenceEquals(newSourceContext, sourceContext))
+                return this;
+
+            var newLogger = logger.Repository.GetLogger(LoggerNameFactory(newSourceContext));
             if (newLogger.Name == logger.Name)
                 return this;
 
-            return new Log4netLog(newLogger);
+            return new Log4netLog(newLogger, newSourceContext);
         }
+
+        private static bool IsTrivialLoggerName([CanBeNull] string loggerName)
+            => string.IsNullOrEmpty(loggerName) || loggerName == "root";
     }
 }
