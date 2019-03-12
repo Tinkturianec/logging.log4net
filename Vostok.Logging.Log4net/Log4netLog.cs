@@ -15,8 +15,7 @@ namespace Vostok.Logging.Log4net
     ///     <item><description>Vostok <see cref="LogLevel"/>s are directly translated to log4net <see cref="Level"/>s.<para/></description></item>
     ///     <item><description>Messages are prerendered into text as Vostok <see cref="ILog"/>'s formatting syntax differs from log4net.<para/></description></item>
     ///     <item><description>Properties are forwarded into log4net event's <see cref="LoggingEvent.Properties"/>.<para/></description></item>
-    ///     <item><description><see cref="ForContext"/> with <c>null</c> argument returns a <see cref="Log4netLog"/> based on root logger from log4net's repository.<para/></description></item>
-    ///     <item><description><see cref="ForContext"/> with non-<c>null</c> argument returns a <see cref="Log4netLog"/> based on logger with name equal to context value, obtained with <see cref="ILoggerRepository.GetLogger"/>.<para/></description></item>
+    ///     <item><description><see cref="ForContext"/> returns a <see cref="Log4netLog"/> with source context augmented with given value and underlying logger obtained from current logger's repository by name obtained by calling <see cref="LoggerNameFactory"/> on new source context.<para/></description></item>
     /// </list>
     /// </summary>
     public class Log4netLog : ILog
