@@ -178,6 +178,21 @@ namespace Vostok.Logging.Log4net.Tests
             ObservedEvent.LoggerName.Should().Be("CustomLogger1.CustomLogger2.CustomLogger3");
         }
 
+        [Test]
+        public void ForContext_should_preserve_configured_logger_name_factory()
+        {
+            ((Log4netLog)adapter).LoggerNameFactory = ctx => string.Join(".", ctx.Reverse());
+
+            adapter = adapter
+                .ForContext("ctx1")
+                .ForContext("ctx2")
+                .ForContext("ctx3");
+
+            adapter.Info("Hello!");
+
+            ObservedEvent.LoggerName.Should().Be("ctx3.ctx2.ctx1");
+        }
+
         private void SetRootLevel(Level level)
         {
             var hierarchy = (Hierarchy) log4netRepository;

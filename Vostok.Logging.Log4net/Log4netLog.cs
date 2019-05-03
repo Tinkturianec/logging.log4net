@@ -80,7 +80,10 @@ namespace Vostok.Logging.Log4net
             if (newLogger.Name == logger.Name)
                 return this;
 
-            return new Log4netLog(newLogger, newSourceContext);
+            return new Log4netLog(newLogger, newSourceContext)
+            {
+                LoggerNameFactory = LoggerNameFactory
+            };
         }
 
         private static bool IsTrivialLoggerName([CanBeNull] string loggerName)
