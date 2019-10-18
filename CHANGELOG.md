@@ -1,3 +1,7 @@
+## 1.0.2 (18.10.2019):
+
+* Fixed lowerCamelCase `WellKnownProperties`.
+
 ## 1.0.1 (03.05.2019)
 
 Fixed a bug where Log4netLog wouldn't preserve its configured LoggerNameFactory after ForContext() calls.
