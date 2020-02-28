@@ -58,6 +58,24 @@ namespace Vostok.Logging.Log4net.Tests
         }
 
         [Test]
+        public void TranslateEvent_should_not_prerender_message_with_trace_id()
+        {
+            log4netEvent = Log4netHelpers.TranslateEvent(log4netLogger, vostokEvent.WithProperty("traceContext", "guid"));
+
+            log4netEvent.MessageObject.Should().Be("Hello, Vostok! You have 150 messages.");
+            log4netEvent.RenderedMessage.Should().Be("Hello, Vostok! You have 150 messages.");
+        }
+
+        [Test]
+        public void TranslateEvent_should_prerender_message_with_trace_id()
+        {
+            log4netEvent = Log4netHelpers.TranslateEvent(log4netLogger, vostokEvent.WithProperty("traceContext", "guid"), true);
+
+            log4netEvent.MessageObject.Should().Be("guid Hello, Vostok! You have 150 messages.");
+            log4netEvent.RenderedMessage.Should().Be("guid Hello, Vostok! You have 150 messages.");
+        }
+
+        [Test]
         public void TranslateEvent_should_keep_original_event_timestamp()
         {
             log4netEvent = Log4netHelpers.TranslateEvent(log4netLogger, vostokEvent);

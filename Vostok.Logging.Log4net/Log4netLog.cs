@@ -22,21 +22,33 @@ namespace Vostok.Logging.Log4net
     {
         private readonly ILogger logger;
         private readonly SourceContextValue sourceContext;
+        private readonly Log4netLogSettings settings;
 
         public Log4netLog([NotNull] log4net.ILog log)
             : this(log.Logger)
         {
         }
 
-        public Log4netLog([NotNull] ILogger logger)
-            : this(logger, IsTrivialLoggerName(logger.Name) ? null : new SourceContextValue(logger.Name))
+        public Log4netLog([NotNull] log4net.ILog log, [NotNull] Log4netLogSettings settings)
+            : this(log.Logger, settings)
         {
         }
 
-        private Log4netLog([NotNull] ILogger logger, SourceContextValue sourceContext)
+        public Log4netLog([NotNull] ILogger logger)
+            : this(logger, IsTrivialLoggerName(logger.Name) ? null : new SourceContextValue(logger.Name), null)
+        {
+        }
+
+        public Log4netLog([NotNull] ILogger logger, [NotNull] Log4netLogSettings settings)
+            : this(logger, IsTrivialLoggerName(logger.Name) ? null : new SourceContextValue(logger.Name), settings)
+        {
+        }
+
+        private Log4netLog([NotNull] ILogger logger, SourceContextValue sourceContext, Log4netLogSettings settings)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.sourceContext = sourceContext;
+            this.settings = settings ?? new Log4netLogSettings();
         }
 
         /// <summary>
@@ -56,7 +68,7 @@ namespace Vostok.Logging.Log4net
             if (!IsEnabledFor(@event.Level))
                 return;
 
-            logger.Log(Log4netHelpers.TranslateEvent(logger, @event));
+            logger.Log(Log4netHelpers.TranslateEvent(logger, @event, settings.UseVostokTemplate));
         }
 
         /// <inheritdoc />
@@ -80,7 +92,7 @@ namespace Vostok.Logging.Log4net
             if (newLogger.Name == logger.Name)
                 return this;
 
-            return new Log4netLog(newLogger, newSourceContext)
+            return new Log4netLog(newLogger, newSourceContext, settings)
             {
                 LoggerNameFactory = LoggerNameFactory
             };

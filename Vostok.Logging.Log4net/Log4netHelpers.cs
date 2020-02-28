@@ -13,6 +13,12 @@ namespace Vostok.Logging.Log4net
 {
     internal static class Log4netHelpers
     {
+        public static readonly OutputTemplate Template = OutputTemplate.Parse(
+            $"{{{WellKnownProperties.TraceContext}:w}}" +
+            $"{{{WellKnownProperties.OperationContext}:w}}" +
+            $"{{{WellKnownProperties.SourceContext}:w}}" +
+            $"{{{WellKnownTokens.Message}}}");
+
         [CanBeNull]
         private static readonly Action<LoggingEvent, DateTime> timestampSetter;
 
@@ -22,10 +28,12 @@ namespace Vostok.Logging.Log4net
         }
 
         [NotNull]
-        public static LoggingEvent TranslateEvent([NotNull] ILogger logger, [NotNull] LogEvent @event)
+        public static LoggingEvent TranslateEvent([NotNull] ILogger logger, [NotNull] LogEvent @event, bool useVostokTemplate = false)
         {
             var level = TranslateLevel(@event.Level);
-            var message = LogMessageFormatter.Format(@event);
+            var message = useVostokTemplate
+                ? LogEventFormatter.Format(@event, Template)
+                : LogMessageFormatter.Format(@event);
             var timestamp = @event.Timestamp.UtcDateTime;
 
             var loggingEvent = new LoggingEvent(typeof(Logger), logger.Repository, logger.Name, level, message, @event.Exception);

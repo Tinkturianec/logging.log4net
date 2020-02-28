@@ -1,3 +1,7 @@
+## 1.0.3 (28.02.2020):
+
+Added `UseVostokTemplate` setting.
+
 ## 1.0.2 (18.10.2019):
 
 * Fixed lowerCamelCase `WellKnownProperties`.
