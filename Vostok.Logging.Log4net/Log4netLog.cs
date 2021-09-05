@@ -68,6 +68,7 @@ namespace Vostok.Logging.Log4net
             if (!IsEnabledFor(@event.Level))
                 return;
 
+            @event = @event.WithProperty(WellKnownProperties.SourceContext, sourceContext + GetSourceContext(@event));
             logger.Log(Log4netHelpers.TranslateEvent(logger, @event, settings.UseVostokTemplate));
         }
 
@@ -100,5 +101,13 @@ namespace Vostok.Logging.Log4net
 
         private static bool IsTrivialLoggerName([CanBeNull] string loggerName)
             => string.IsNullOrEmpty(loggerName) || loggerName == "root";
+
+        private SourceContextValue GetSourceContext([CanBeNull] LogEvent @event)
+        {
+            if (@event?.Properties == null)
+                return null;
+
+            return @event.Properties.TryGetValue(WellKnownProperties.SourceContext, out var value) ? value as SourceContextValue : null;
+        }
     }
 }
