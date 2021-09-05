@@ -203,6 +203,45 @@ namespace Vostok.Logging.Log4net.Tests
             ObservedEvent.LoggerName.Should().Be("ctx3.ctx2.ctx1");
         }
 
+        [Test]
+        public void ForContext_with_non_null_argument_should_render_context()
+        {
+            adapter = new Log4netLog(log4netLogger, new Log4netLogSettings {UseVostokTemplate = true})
+                .ForContext("CustomLogger");
+
+            adapter.Info("Hello!");
+
+            Output.Should().Be("[CustomLogger] Hello!");
+        }
+
+        [Test]
+        public void ForContext_should_support_accumulating_context_with_a_chain_of_calls()
+        {
+            adapter = new Log4netLog(log4netLogger, new Log4netLogSettings {UseVostokTemplate = true})
+                .ForContext("CustomLogger1")
+                .ForContext("CustomLogger2")
+                .ForContext("CustomLogger3");
+
+            adapter.Info("Hello!");
+
+            Output.Should().Be("[CustomLogger1 => CustomLogger2 => CustomLogger3] Hello!");
+        }
+
+        [Test]
+        public void ForContext_should_ignore_configured_logger_name_factory_on_render()
+        {
+            ((Log4netLog)adapter).LoggerNameFactory = ctx => string.Join(".", ctx.Reverse());
+
+            adapter = new Log4netLog(log4netLogger, new Log4netLogSettings {UseVostokTemplate = true})
+                .ForContext("ctx1")
+                .ForContext("ctx2")
+                .ForContext("ctx3");
+
+            adapter.Info("Hello!");
+
+            Output.Should().Be("[ctx1 => ctx2 => ctx3] Hello!");
+        }
+
         private void SetRootLevel(Level level)
         {
             var hierarchy = (Hierarchy) log4netRepository;
