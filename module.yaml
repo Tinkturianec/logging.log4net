@@ -15,7 +15,22 @@ notests *default:
     - vostok.logging.abstractions
     - vostok.logging.formatting
 
-full-build > notests:
+tests > notests:
+  build:
+    target: Vostok.Logging.Log4net.sln
+    configuration: Tests
+    tool:
+      name: dotnet
+
+  deps:
+    - vostok.context
+    - vostok.logging.abstractions
+    - vostok.logging.context
+    - vostok.logging.tracing
+    - vostok.tracing
+    - vostok.tracing.abstractions
+
+full-build > notests, tests:
   build:
     target: Vostok.Logging.Log4net.sln
     configuration: Release

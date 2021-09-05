@@ -143,16 +143,6 @@ namespace Vostok.Logging.Log4net.Tests
         }
 
         [Test]
-        public void Log_method_should_render_trace_id()
-        {
-            adapter = new Log4netLog(log4netLogger, new Log4netLogSettings {UseVostokTemplate = true});
-
-            adapter.WithProperty("traceContext", "guid").Info("Hello!");
-
-            Output.Should().Be("guid Hello!");
-        }
-
-        [Test]
         public void Log_method_should_translate_all_properties_not_present_in_template()
         {
             var @event = new LogEvent(LogLevel.Info, DateTimeOffset.Now, null)
@@ -202,6 +192,7 @@ namespace Vostok.Logging.Log4net.Tests
 
             ObservedEvent.LoggerName.Should().Be("ctx3.ctx2.ctx1");
         }
+
 
         private void SetRootLevel(Level level)
         {
